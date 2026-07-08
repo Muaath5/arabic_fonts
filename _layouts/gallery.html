@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title }}{% if site.title %} · {{ site.title }}{% endif %}</title>
+  <meta name="description" content="{{ page.description }}">
+
+  <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="{{ '/' | relative_url }}">خطوط</a>
+      <a class="header-link" href="https://github.com/{{ site.github_repo | default: 'your-org/your-repo' }}" target="_blank" rel="noopener">المصدر على GitHub</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="intro">
+      <h1>معرض خطوط عربية</h1>
+      <p>اكتب أي نص، وشاهده بكل الخطوط المتاحة. اضغط على أي خط لتنزيله أو تضمينه في موقعك.</p>
+    </section>
+
+    <section class="composer">
+      <label class="visually-hidden" for="preview-input">نص المعاينة</label>
+      <input
+        id="preview-input"
+        type="text"
+        dir="rtl"
+        autocomplete="off"
+        spellcheck="false"
+        value="الخط الجميل هو موسيقى للعين"
+        placeholder="اكتب نصًا لمعاينته…">
+    </section>
+
+    <section class="toolbar">
+      <div class="size-control">
+        <label for="size-range">الحجم</label>
+        <input id="size-range" type="range" min="24" max="120" value="48" step="2">
+      </div>
+      <div class="count" id="result-count" aria-live="polite"></div>
+    </section>
+
+    <section class="specimen-list" id="specimen-list" aria-live="polite">
+      <p class="loading">جارٍ تحميل الخطوط…</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>خطوط مجانية لتحميل حر — راجع رخصة كل خط قبل الاستخدام التجاري.</p>
+    </div>
+  </footer>
+
+  <!-- Embed popup -->
+  <div class="modal-backdrop" id="embed-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="embed-title">
+      <div class="modal-head">
+        <h2 id="embed-title">تضمين الخط</h2>
+        <button class="modal-close" type="button" data-close-modal aria-label="إغلاق">✕</button>
+      </div>
+      <p class="modal-hint">أضف هذا الكود إلى ملف CSS في موقعك، ثم استخدم اسم الخط في <code>font-family</code>.</p>
+      <pre class="code-block"><code id="embed-code"></code></pre>
+      <button class="btn btn-primary" type="button" id="embed-copy">نسخ الكود</button>
+    </div>
+  </div>
+
+  <!-- Download popup -->
+  <div class="modal-backdrop" id="download-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="download-title">
+      <div class="modal-head">
+        <h2 id="download-title">تنزيل الخط</h2>
+        <button class="modal-close" type="button" data-close-modal aria-label="إغلاق">✕</button>
+      </div>
+      <a class="btn btn-primary btn-block" id="download-all-link" href="#" download>
+        تنزيل الكل (<span id="download-all-count"></span>)
+      </a>
+      <p class="modal-hint">أو اختر تفاصيل بعينها:</p>
+      <ul class="typeface-list" id="typeface-list"></ul>
+    </div>
+  </div>
+
+  <script src="{{ '/assets/js/app.js' | relative_url }}"></script>
+</body>
+</html>

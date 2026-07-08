@@ -1,0 +1,36 @@
+[
+  {
+    "id": "alkufi",
+    "name": "الكوفي",
+    "name_en": "Alkufi",
+    "creator": "Asdf Studio",
+    "creator_url": "",
+    "license": "SIL Open Font License 1.1",
+    "license_url": "https://scripts.sil.org/OFL",
+    "category": "Kufi",
+    "year": 2021,
+    "typefaces": [
+      {
+        "name": "عادي",
+        "name_en": "Regular",
+        "file": "alkufi/alkufi-regular.ttf",
+        "weight": 400,
+        "style": "normal"
+      },
+      {
+        "name": "عريض",
+        "name_en": "Bold",
+        "file": "alkufi/alkufi-bold.ttf",
+        "weight": 700,
+        "style": "normal"
+      },
+      {
+        "name": "خفيف",
+        "name_en": "Light",
+        "file": "alkufi/alkufi-light.ttf",
+        "weight": 300,
+        "style": "normal"
+      }
+    ]
+  }
+]

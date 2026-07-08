@@ -1,0 +1,362 @@
+/* ============================================================
+   خطوط — Arabic type specimen gallery
+   Design: paper/ink specimen sheet. No gradients, no motion,
+   no emoji. The typefaces are the visual content — the UI is
+   quiet on purpose.
+   ============================================================ */
+
+:root {
+  /* -- palette -- */
+  --paper: #FAFAF8;
+  --ink: #1A1A18;
+  --ink-dim: #8A8780;
+  --line: #E4E2DC;
+  --line-strong: #C9C6BD;
+  --accent: #2B3A67;      /* deep indigo — used sparingly, for actions only */
+  --accent-ink: #FAFAF8;
+
+  /* -- type (UI chrome only — never used for specimens) -- */
+  --font-ui: "IBM Plex Sans Arabic", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+
+  /* -- scale -- */
+  --wrap-max: 880px;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  line-height: 1.6;
+}
+
+.wrap {
+  max-width: var(--wrap-max);
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* -- focus visibility (accessibility floor) -- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* -- header -- */
+.site-header {
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.brand {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+.header-link {
+  font-size: 0.9rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.header-link:hover {
+  color: var(--ink);
+  border-bottom-color: var(--line-strong);
+}
+
+/* -- intro -- */
+.intro {
+  padding: var(--space-5) 0 var(--space-4);
+}
+.intro h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin: 0 0 var(--space-2);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.intro p {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 1.05rem;
+  max-width: 55ch;
+}
+
+/* -- composer input -- */
+.composer {
+  margin-bottom: var(--space-3);
+}
+#preview-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  padding: var(--space-2) 0.1em;
+  font-family: var(--font-ui);
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  color: var(--ink);
+}
+#preview-input::placeholder {
+  color: var(--ink-dim);
+}
+#preview-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+/* -- toolbar -- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-2);
+}
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+.size-control input[type="range"] {
+  width: 140px;
+  accent-color: var(--accent);
+}
+.count {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+/* -- specimen list -- */
+.specimen-list {
+  padding-bottom: var(--space-5);
+}
+.loading, .empty-state {
+  color: var(--ink-dim);
+  padding: var(--space-4) 0;
+  text-align: center;
+}
+
+.specimen {
+  border-bottom: 1px solid var(--line);
+  padding: var(--space-4) 0;
+}
+.specimen:first-child {
+  padding-top: 0;
+}
+
+.specimen-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.specimen-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.specimen-creator {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+.specimen-category {
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  padding: 0.1em 0.6em;
+}
+
+.specimen-text {
+  direction: rtl;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  color: var(--ink);
+  line-height: 1.4;
+  cursor: pointer;
+  scrollbar-width: none;
+}
+.specimen-text::-webkit-scrollbar { display: none; }
+
+.specimen-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* -- buttons -- */
+.btn {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+  padding: 0.5em 1em;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn:hover {
+  border-color: var(--ink);
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.btn-primary:hover {
+  background: #22305A;
+  border-color: #22305A;
+}
+.btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  margin-bottom: var(--space-3);
+}
+
+/* -- modal -- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 24, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  z-index: 100;
+}
+.modal-backdrop[hidden] { display: none; }
+
+.modal {
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+.modal-head h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+.modal-close {
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  color: var(--ink-dim);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25em;
+}
+.modal-close:hover { color: var(--ink); }
+
+.modal-hint {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  margin: 0 0 var(--space-2);
+}
+
+.code-block {
+  background: #F0EEE8;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: var(--space-2);
+  overflow-x: auto;
+  font-size: 0.8rem;
+  direction: ltr;
+  text-align: left;
+  margin: 0 0 var(--space-2);
+}
+.code-block code {
+  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  white-space: pre;
+}
+
+.typeface-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.typeface-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.typeface-list .tf-name {
+  color: var(--ink);
+}
+.typeface-list .tf-weight {
+  color: var(--ink-dim);
+  font-size: 0.8rem;
+}
+
+/* -- footer -- */
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: var(--space-3) 0;
+}
+.site-footer p {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* -- responsive -- */
+@media (max-width: 560px) {
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .size-control input[type="range"] { flex: 1; width: auto; }
+  .specimen-meta { flex-direction: column; align-items: flex-start; gap: 0.25em; }
+}
+
+/* -- reduced motion: respected even though we use ~no motion already -- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

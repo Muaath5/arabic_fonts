@@ -1,0 +1,32 @@
+title: خطوط
+description: معرض خطوط عربية مجانية للمعاينة والتنزيل والتضمين
+lang: ar
+
+github_repo: your-org/your-repo   # change to your actual GitHub "org/repo"
+
+# If you deploy this as a PROJECT page (username.github.io/repo-name/)
+# rather than a custom domain or user/org root page, uncomment and set:
+# baseurl: "/repo-name"
+# The <link>/<script> tags in _layouts/gallery.html already use the
+# relative_url filter so they'll respect this automatically. The
+# fetch("fonts.generated.json") and fonts/... paths in app.js are
+# relative to the page itself, so they need no change either way.
+
+# Jekyll should treat these as plain static files to copy through as-is
+include:
+  - fonts.generated.json
+
+# fonts/ contains real font binaries + generated zips — don't let Jekyll
+# try to parse/process them, just copy them through untouched
+keep_files:
+  - fonts
+
+exclude:
+  - build.py
+  - fonts.json
+  - README.md
+  - LICENSE
+  - node_modules
+  - .github
+
+plugins: []

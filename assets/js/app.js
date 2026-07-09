@@ -100,7 +100,7 @@
     meta.innerHTML = `
       <span>
         <span class="specimen-name">${escapeHtml(font.name)}</span>
-        <span class="specimen-creator"> — ${escapeHtml(font.creator)}</span>
+        ${font.creator ? `<span class="specimen-creator"> — ${escapeHtml(font.creator)}</span>` : ""}
       </span>
       ${font.category ? `<span class="specimen-category">${escapeHtml(font.category)}</span>` : ""}
     `;

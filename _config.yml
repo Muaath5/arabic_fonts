@@ -1,9 +1,10 @@
-title: خطوط
-description: معرض خطوط عربية مجانية للمعاينة والتنزيل والتضمين
+title: "خطوط معاذ"
+description: "معرض لتنزيل أجود أنواع الخطوط العربية"
 lang: ar
 
-github_repo: your-org/your-repo   # change to your actual GitHub "org/repo"
+github_repo: "Muaath5/bank_sms_parser"   # change to your actual GitHub "org/repo"
 
+repository: "Muaath5/bank_sms_parser"
 # If you deploy this as a PROJECT page (username.github.io/repo-name/)
 # rather than a custom domain or user/org root page, uncomment and set:
 # baseurl: "/repo-name"

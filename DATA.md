@@ -1,9 +1,4 @@
-# fonts.json — schema
-
-This is the file you edit to add or change fonts on the site. `build.py`
-reads it, validates it, and generates everything else — you should never
-need to edit `fonts.generated.json`, `index.html`'s front matter, or the
-per-font `.zip` files by hand; `build.py` writes all of them.
+# `fonts.json` Schema
 
 `fonts.json` is a single JSON array at the repo root. Each item is one
 **font family** (e.g. "Alkufi"), which can have multiple **typefaces**
@@ -67,23 +62,8 @@ per-font `.zip` files by hand; `build.py` writes all of them.
 ]
 ```
 
-## What `build.py` generates from this
-
-- **`fonts.generated.json`** — what the site's JavaScript actually fetches.
-  Same data, plus a `format` field per typeface (guessed from the file
-  extension) and a `zip` field pointing at the generated bundle.
-- **`fonts/<id>/<id>-all.zip`** — every typeface of that font zipped
-  together, for the "Download all" button.
-- **`index.html`** front matter — just points Jekyll at the `gallery`
-  layout; the actual content is rendered client-side.
-
 ## Formats
 
 Recognized extensions: `.woff2`, `.woff`, `.ttf`, `.otf`, `.eot`. Anything
 else is still included (the build won't break) but a warning is printed,
 since the browser may not know how to load it.
-
-> **Known limitation / TODO:** `build.py` does not currently convert
-> fonts to `.woff2` automatically — it uses whatever format you give it.
-> Auto-generating `.woff2` from `.ttf`/`.otf` during the build (so every
-> font gets the smallest format for free) is a planned improvement.

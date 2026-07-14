@@ -1,19 +1,18 @@
-/* ============================================================
-   خطوط — app.js
-   Loads fonts.generated.json, injects @font-face rules for every
-   typeface, renders the specimen list, and wires the Embed /
-   Download popups. No frameworks, no build step needed.
-   ============================================================ */
-
 (function () {
   "use strict";
 
-  const DATA_URL = "fonts.generated.json";
-  const FONTS_BASE = "fonts/"; // relative to site root
+  const DATA_URL = "fonts.json";
+  const FONTS_BASE = "fonts/";
 
-  const state = {
-    fonts: [],
+  const FORMAT_MAP = {
+    woff2: "woff2",
+    woff: "woff",
+    ttf: "truetype",
+    otf: "opentype",
+    eot: "embedded-opentype",
   };
+
+  const state = { fonts: [] };
 
   const el = {
     input: document.getElementById("preview-input"),
@@ -29,11 +28,40 @@
     typefaceList: document.getElementById("typeface-list"),
   };
 
-  // -- utilities --------------------------------------------------
+  function slugify(text) {
+    return String(text)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
 
-  function fontFamilyName(font) {
-    // Stable, collision-free CSS font-family identifier.
-    return "af-" + font.id;
+  function guessFormat(filePath) {
+    const ext = filePath.split(".").pop().toLowerCase();
+    return FORMAT_MAP[ext] || null;
+  }
+
+  // Normalizes a raw fonts.json entry into what the UI needs: a stable
+  // id, a computed @font-face family name, and per-typeface format/zip
+  // paths — mirroring what build.py validates server-side.
+  function normalizeFont(raw) {
+    const id = raw.id || slugify(raw.name_en || raw.name);
+    const typefaces = (raw.typefaces || []).map((tf) => ({
+      name: tf.name,
+      file: tf.file,
+      weight: tf.weight || 400,
+      style: tf.style || "normal",
+      format: guessFormat(tf.file),
+    }));
+    return {
+      id,
+      name: raw.name,
+      creator: raw.creator || "",
+      category: raw.category || "",
+      typefaces,
+      family: "af-" + id,
+      zip: FONTS_BASE + id + "/" + id + "-all.zip",
+    };
   }
 
   function resolveFontUrl(relPath) {
@@ -48,19 +76,16 @@
       .replace(/"/g, "&quot;");
   }
 
-  // -- @font-face injection ----------------------------------------
-
   function injectFontFaces(fonts) {
     const sheet = document.createElement("style");
     let css = "";
     for (const font of fonts) {
-      const family = fontFamilyName(font);
       for (const tf of font.typefaces) {
         const url = resolveFontUrl(tf.file);
         const formatPart = tf.format ? ` format("${tf.format}")` : "";
         css += `
 @font-face {
-  font-family: "${family}";
+  font-family: "${font.family}";
   src: url("${url}")${formatPart};
   font-weight: ${tf.weight};
   font-style: ${tf.style};
@@ -71,8 +96,6 @@
     sheet.textContent = css;
     document.head.appendChild(sheet);
   }
-
-  // -- rendering ----------------------------------------------------
 
   function render() {
     const text = el.input.value.trim() || el.input.placeholder;
@@ -95,12 +118,16 @@
     const wrap = document.createElement("article");
     wrap.className = "specimen";
 
+    const creatorHtml = font.creator
+      ? `<span class="specimen-creator"> — ${escapeHtml(font.creator)}</span>`
+      : "";
+
     const meta = document.createElement("div");
     meta.className = "specimen-meta";
     meta.innerHTML = `
       <span>
         <span class="specimen-name">${escapeHtml(font.name)}</span>
-        ${font.creator ? `<span class="specimen-creator"> — ${escapeHtml(font.creator)}</span>` : ""}
+        ${creatorHtml}
       </span>
       ${font.category ? `<span class="specimen-category">${escapeHtml(font.category)}</span>` : ""}
     `;
@@ -108,7 +135,7 @@
 
     const sample = document.createElement("div");
     sample.className = "specimen-text";
-    sample.style.fontFamily = `"${fontFamilyName(font)}"`;
+    sample.style.fontFamily = `"${font.family}"`;
     sample.style.fontSize = size + "px";
     sample.textContent = text;
     sample.title = "اضغط لتضمين هذا الخط";
@@ -136,16 +163,13 @@
     return wrap;
   }
 
-  // -- embed modal ----------------------------------------------------
-
   function buildEmbedCss(font) {
-    const family = fontFamilyName(font);
     let css = "";
     for (const tf of font.typefaces) {
       const url = resolveFontUrl(tf.file);
       const formatPart = tf.format ? ` format("${tf.format}")` : "";
       css += `@font-face {
-  font-family: "${family}";
+  font-family: "${font.family}";
   src: url("${url}")${formatPart};
   font-weight: ${tf.weight};
   font-style: ${tf.style};
@@ -154,16 +178,15 @@
 `;
     }
     css += `
-/* usage */
+/* الاستخدام */
 .your-element {
-  font-family: "${family}", sans-serif;
+  font-family: "${font.family}", sans-serif;
 }`;
     return css;
   }
 
   function openEmbedModal(font) {
     el.embedCode.textContent = buildEmbedCss(font);
-    el.embedCopy.dataset.copied = "0";
     el.embedCopy.textContent = "نسخ الكود";
     showModal(el.embedModal);
   }
@@ -177,15 +200,8 @@
     }
   });
 
-  // -- download modal ----------------------------------------------------
-
   function openDownloadModal(font) {
-    if (font.zip) {
-      el.downloadAllLink.href = resolveFontUrl(font.zip);
-      el.downloadAllLink.hidden = false;
-    } else {
-      el.downloadAllLink.hidden = true;
-    }
+    el.downloadAllLink.href = resolveFontUrl(font.id + "/" + font.id + "-all.zip");
     el.downloadAllCount.textContent = `${font.typefaces.length} ملفات`;
 
     el.typefaceList.innerHTML = "";
@@ -208,8 +224,6 @@
 
     showModal(el.downloadModal);
   }
-
-  // -- modal plumbing ----------------------------------------------------
 
   function showModal(modal) {
     modal.hidden = false;
@@ -241,18 +255,15 @@
     }
   });
 
-  // -- events ----------------------------------------------------
-
   el.input.addEventListener("input", render);
   el.sizeRange.addEventListener("input", render);
-
-  // -- boot ----------------------------------------------------
 
   async function init() {
     try {
       const res = await fetch(DATA_URL, { cache: "no-cache" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      state.fonts = await res.json();
+      const raw = await res.json();
+      state.fonts = raw.map(normalizeFont);
     } catch (err) {
       el.list.innerHTML = `<p class="empty-state">تعذّر تحميل قائمة الخطوط (${escapeHtml(err.message)}).</p>`;
       return;

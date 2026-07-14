@@ -6,7 +6,6 @@
    ============================================================ */
 
 :root {
-  /* -- palette -- */
   --paper: #FAFAF8;
   --ink: #1A1A18;
   --ink-dim: #8A8780;
@@ -18,7 +17,6 @@
   /* -- type (UI chrome only — never used for specimens) -- */
   --font-ui: "IBM Plex Sans Arabic", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
 
-  /* -- scale -- */
   --wrap-max: 880px;
   --space-1: 0.5rem;
   --space-2: 1rem;
@@ -55,7 +53,6 @@ body {
   white-space: nowrap;
 }
 
-/* -- focus visibility (accessibility floor) -- */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible {
@@ -63,7 +60,6 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-/* -- header -- */
 .site-header {
   border-bottom: 1px solid var(--line);
 }
@@ -90,7 +86,6 @@ input:focus-visible {
   border-bottom-color: var(--line-strong);
 }
 
-/* -- intro -- */
 .intro {
   padding: var(--space-5) 0 var(--space-4);
 }
@@ -107,7 +102,6 @@ input:focus-visible {
   max-width: 55ch;
 }
 
-/* -- composer input -- */
 .composer {
   margin-bottom: var(--space-3);
 }
@@ -129,7 +123,6 @@ input:focus-visible {
   border-bottom-color: var(--accent);
 }
 
-/* -- toolbar -- */
 .toolbar {
   display: flex;
   align-items: center;
@@ -156,7 +149,6 @@ input:focus-visible {
   white-space: nowrap;
 }
 
-/* -- specimen list -- */
 .specimen-list {
   padding-bottom: var(--space-5);
 }
@@ -216,7 +208,6 @@ input:focus-visible {
   margin-top: var(--space-2);
 }
 
-/* -- buttons -- */
 .btn {
   font-family: var(--font-ui);
   font-size: 0.85rem;
@@ -249,7 +240,6 @@ input:focus-visible {
   margin-bottom: var(--space-3);
 }
 
-/* -- modal -- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -337,7 +327,6 @@ input:focus-visible {
   font-size: 0.8rem;
 }
 
-/* -- footer -- */
 .site-footer {
   border-top: 1px solid var(--line);
   padding: var(--space-3) 0;
@@ -349,7 +338,6 @@ input:focus-visible {
   text-align: center;
 }
 
-/* -- responsive -- */
 @media (max-width: 560px) {
   .toolbar { flex-direction: column; align-items: stretch; }
   .size-control input[type="range"] { flex: 1; width: auto; }

@@ -1,33 +1,30 @@
-title: "خطوط معاذ"
-description: "معرض لتنزيل أجود أنواع الخطوط العربية"
-lang: ar
+# Change these two and the whole site (title tag, meta description, OG/Twitter
+# tags, JSON-LD) updates automatically — nothing else to touch.
+title: خطوط
+description: معرض خطوط عربية مجانية للمعاينة والتنزيل والتضمين
 
-github_repo: "Muaath5/bank_sms_parser"   # change to your actual GitHub "org/repo"
+# Site domain, no trailing slash. Used to build canonical/OG URLs.
+# Change this if the domain changes — everything derives from it.
+url: "https://fonts.muaath.dev"
 
-repository: "Muaath5/bank_sms_parser"
-# If you deploy this as a PROJECT page (username.github.io/repo-name/)
-# rather than a custom domain or user/org root page, uncomment and set:
+# Uncomment and set if deployed as a GitHub Pages PROJECT page
+# (username.github.io/repo-name/) instead of a custom domain or user/org root.
 # baseurl: "/repo-name"
-# The <link>/<script> tags in _layouts/gallery.html already use the
-# relative_url filter so they'll respect this automatically. The
-# fetch("fonts.generated.json") and fonts/... paths in app.js are
-# relative to the page itself, so they need no change either way.
 
-# Jekyll should treat these as plain static files to copy through as-is
-include:
-  - fonts.generated.json
+lang: ar
+github_repo: Muaath5/arabic_fonts
+og_image: /assets/img/og-image.png
 
-# fonts/ contains real font binaries + generated zips — don't let Jekyll
-# try to parse/process them, just copy them through untouched
 keep_files:
   - fonts
 
 exclude:
   - build.py
-  - fonts.json
   - README.md
   - LICENSE
+  - DATA.md
   - node_modules
   - .github
 
-plugins: []
+plugins:
+  - jekyll-sitemap

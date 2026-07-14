@@ -1,34 +1,75 @@
 [
+  
   {
-    "id": "alkufi",
-    "name": "الكوفي",
-    "name_en": "Alkufi",
-    "creator": "Asdf Studio",
-    "creator_url": "",
-    "license": "SIL Open Font License 1.1",
-    "license_url": "https://scripts.sil.org/OFL",
-    "category": "Kufi",
-    "year": 2021,
+    "id": "alawwal",
+    "name": "الأول",
+    "name_en": "Alawwal",
+    "creator": "وزارة الثقافة السعودية",
+    "creator_url": "https://engage.moc.gov.sa/e/fonts/alawwal-font/?lang=ar",
+    "license": "ترخيص وزارة الثقافة — راجع الاتفاقية قبل الاستخدام التجاري أو إعادة التوزيع",
+    "license_url": "https://engage.moc.gov.sa/e/fonts/alawwal-font/?lang=ar",
+    "category": "تراثي",
+    "year": 2025,
     "typefaces": [
       {
         "name": "عادي",
         "name_en": "Regular",
-        "file": "alkufi/alkufi-regular.ttf",
+        "file": "alawwal/alawwal-regular.ttf",
         "weight": 400,
         "style": "normal"
       },
       {
         "name": "عريض",
         "name_en": "Bold",
-        "file": "alkufi/alkufi-bold.ttf",
+        "file": "alawwal/alawwal-bold.ttf",
         "weight": 700,
+        "style": "normal"
+      }
+    ]
+  },
+  {
+    "id": "saudi",
+    "name": "السعودي",
+    "name_en": "Saudi",
+    "creator": "وزارة الثقافة السعودية",
+    "creator_url": "https://engage.moc.gov.sa/e/fonts/saudi-font/?lang=ar",
+    "license": "ترخيص وزارة الثقافة — راجع الاتفاقية قبل الاستخدام التجاري أو إعادة التوزيع",
+    "license_url": "https://engage.moc.gov.sa/e/fonts/saudi-font/?lang=ar",
+    "category": "تراثي",
+    "year": 2025,
+    "typefaces": [
+      {
+        "name": "عادي",
+        "name_en": "Regular",
+        "file": "saudi/saudi-regular.ttf",
+        "weight": 400,
         "style": "normal"
       },
       {
-        "name": "خفيف",
-        "name_en": "Light",
-        "file": "alkufi/alkufi-light.ttf",
-        "weight": 300,
+        "name": "عريض",
+        "name_en": "Bold",
+        "file": "saudi/saudi-bold.ttf",
+        "weight": 700,
+        "style": "normal"
+      }
+    ]
+  },
+  {
+    "id": "rakkas",
+    "name": "رقّاص",
+    "name_en": "Rakkas",
+    "creator": "Zeynep Akay",
+    "creator_url": "https://fonts.google.com/specimen/Rakkas",
+    "license": "SIL Open Font License 1.1",
+    "license_url": "https://scripts.sil.org/OFL",
+    "category": "زخرفي",
+    "year": 2013,
+    "typefaces": [
+      {
+        "name": "عادي",
+        "name_en": "Regular",
+        "file": "rakkas/rakkas-regular.ttf",
+        "weight": 400,
         "style": "normal"
       }
     ]

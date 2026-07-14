@@ -1,29 +1,17 @@
 #!/usr/bin/env python3
 """
-build.py — builds the static data + assets for the Arabic fonts gallery
-from fonts.json, before Jekyll runs.
+build.py — validates fonts.json and generates per-font zip bundles,
+before Jekyll runs.
 
-What it does:
-  1. Reads fonts.json (source of truth, hand-edited by maintainers).
-  2. Validates every entry and every referenced font file actually exists
-     under fonts/.
-  3. Fills in sensible defaults for optional fields (id, weight, style...).
-  4. Writes fonts.generated.json — the file the front-end JavaScript
-     fetches at runtime. It carries only what the page needs, with paths
-     already resolved.
-  5. Generates a fontname-all.zip next to each font's files, containing
-     every typeface of that font, so the "Download all" button in the
-     Download popup can link straight to a static file (no JS zipping,
-     no server).
-  6. Writes/rewrites index.html with Jekyll front matter pointing at the
-     layout in _layouts/, so Jekyll only has to render the shell — all
-     real content is loaded client-side from fonts.generated.json.
+fonts.json itself ships as a static file; assets/js/app.js fetches and
+parses it directly in the browser. This script's job is:
+  1. Validate every entry and fail the build (exit 1) if something is
+     wrong, so a broken fonts.json never gets deployed silently.
+  2. Generate fonts/<id>/<id>-all.zip for each font, since zipping
+     client-side isn't practical.
 
-Run this before `jekyll build` / `jekyll serve`. The GitHub Actions
-workflow in .github/workflows/ does this automatically on every push.
-
-Usage:
-    python build.py
+Run before `jekyll build` / `jekyll serve`. The GitHub Actions workflow
+does this automatically on every push.
 """
 
 from __future__ import annotations
@@ -37,15 +25,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 FONTS_JSON = ROOT / "fonts.json"
 FONTS_DIR = ROOT / "fonts"
-OUTPUT_JSON = ROOT / "fonts.generated.json"
 INDEX_HTML = ROOT / "index.html"
 
-SITE_BASE_URL = "https://fonts.muaath.dev"  # used only for embed CSS preview/docs
-
-# Recognized font file extensions and the CSS @font-face format() keyword
-# they map to. If a file extension isn't in this dict, build.py still
-# includes it (so nothing silently breaks) but flags it in the summary
-# so you know it wasn't recognized.
 FORMAT_MAP = {
     ".woff2": "woff2",
     ".woff": "woff",
@@ -58,7 +39,7 @@ VALID_WEIGHTS = set(range(100, 1000, 100))
 
 
 class BuildError(Exception):
-    """Raised for problems in fonts.json that stop the build."""
+    pass
 
 
 def slugify(text: str) -> str:
@@ -79,22 +60,19 @@ def load_fonts_json() -> list[dict]:
     return data
 
 
-def validate_and_normalize_font(raw: dict, index: int, seen_ids: set[str]) -> dict:
+def validate_font(raw: dict, index: int, seen_ids: set[str]) -> dict:
     where = f"fonts.json[{index}]"
 
     name = raw.get("name")
     if not name or not isinstance(name, str):
         raise BuildError(f"{where}: missing required string field 'name'")
 
-    creator = raw.get("creator")
-    if not creator or not isinstance(creator, str):
-        raise BuildError(f"{where}: missing required string field 'creator'")
+    creator = raw.get("creator") or ""
 
     typefaces_raw = raw.get("typefaces")
     if not isinstance(typefaces_raw, list) or len(typefaces_raw) == 0:
         raise BuildError(f"{where} ('{name}'): 'typefaces' must be a non-empty array")
 
-    # id: explicit id wins, otherwise derive from name_en, otherwise from name.
     font_id = raw.get("id") or slugify(raw.get("name_en") or name)
     if not font_id:
         raise BuildError(f"{where} ('{name}'): could not derive an id — set 'id' explicitly")
@@ -118,20 +96,17 @@ def validate_and_normalize_font(raw: dict, index: int, seen_ids: set[str]) -> di
         file_path = FONTS_DIR / file_rel
         if not file_path.exists():
             raise BuildError(
-                f"{tf_where} ('{tf_name}'): file 'fonts/{file_rel}' does not exist. "
-                f"Check the path is relative to fonts/."
+                f"{tf_where} ('{tf_name}'): file 'fonts/{file_rel}' does not exist"
             )
         if file_path in seen_tf_files:
             raise BuildError(f"{tf_where}: file '{file_rel}' listed twice for the same font")
         seen_tf_files.add(file_path)
 
         ext = file_path.suffix.lower()
-        fmt = FORMAT_MAP.get(ext)
-        if fmt is None:
+        if ext not in FORMAT_MAP:
             print(
-                f"  ! warning: {tf_where} ('{tf_name}'): unrecognized font "
-                f"extension '{ext}' — included as-is, but the browser may not "
-                f"know how to load it. Recognized: {', '.join(FORMAT_MAP)}",
+                f"  ! warning: {tf_where} ('{tf_name}'): unrecognized extension "
+                f"'{ext}' — recognized: {', '.join(FORMAT_MAP)}",
                 file=sys.stderr,
             )
 
@@ -139,99 +114,50 @@ def validate_and_normalize_font(raw: dict, index: int, seen_ids: set[str]) -> di
         if weight not in VALID_WEIGHTS:
             print(
                 f"  ! warning: {tf_where} ('{tf_name}'): weight {weight!r} is not "
-                f"a standard CSS weight (100-900, step 100) — using it as-is",
+                f"a standard CSS weight (100-900, step 100)",
                 file=sys.stderr,
             )
 
-        typefaces.append(
-            {
-                "name": tf_name,
-                "name_en": tf_raw.get("name_en") or tf_name,
-                "file": file_rel,
-                "format": fmt,  # None if unrecognized; front-end should skip format() then
-                "weight": weight,
-                "style": tf_raw.get("style", "normal"),
-            }
-        )
+        typefaces.append({"name": tf_name, "file": file_rel})
 
-    return {
-        "id": font_id,
-        "name": name,
-        "name_en": raw.get("name_en") or name,
-        "creator": creator,
-        "creator_url": raw.get("creator_url") or "",
-        "license": raw.get("license") or "",
-        "license_url": raw.get("license_url") or "",
-        "category": raw.get("category") or "",
-        "year": raw.get("year"),
-        "typefaces": typefaces,
-    }
+    return {"id": font_id, "name": name, "creator": creator, "typefaces": typefaces}
 
 
-def make_zip(font: dict) -> str | None:
-    """Create fonts/<id>/<id>-all.zip containing every typeface file for this font.
-    Returns the path relative to the repo root, or None if there was nothing to zip.
-    """
-    if len(font["typefaces"]) == 0:
-        return None
-
+def make_zip(font: dict) -> None:
     out_dir = FONTS_DIR / font["id"]
     out_dir.mkdir(parents=True, exist_ok=True)
-    zip_rel_path = f"{font['id']}/{font['id']}-all.zip"
-    zip_path = FONTS_DIR / zip_rel_path
+    zip_path = out_dir / f"{font['id']}-all.zip"
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         for tf in font["typefaces"]:
             src = FONTS_DIR / tf["file"]
-            # flatten into the zip root using the original filename
             zf.write(src, arcname=Path(tf["file"]).name)
 
-    return zip_rel_path
+
+def write_index_html() -> None:
+    INDEX_HTML.write_text(
+        "---\nlayout: gallery\npermalink: /\n---\n", encoding="utf-8"
+    )
 
 
 def build() -> None:
     print("→ reading fonts.json")
     raw_fonts = load_fonts_json()
 
-    print(f"→ validating {len(raw_fonts)} font entr{'y' if len(raw_fonts)==1 else 'ies'}")
+    print(f"→ validating {len(raw_fonts)} font entr{'y' if len(raw_fonts) == 1 else 'ies'}")
     seen_ids: set[str] = set()
-    fonts = [
-        validate_and_normalize_font(raw, i, seen_ids) for i, raw in enumerate(raw_fonts)
-    ]
+    fonts = [validate_font(raw, i, seen_ids) for i, raw in enumerate(raw_fonts)]
 
     print("→ generating per-font zip bundles")
     for font in fonts:
-        zip_rel = make_zip(font)
-        font["zip"] = zip_rel
-        if zip_rel:
-            print(f"  - fonts/{zip_rel} ({len(font['typefaces'])} files)")
+        make_zip(font)
+        print(f"  - fonts/{font['id']}/{font['id']}-all.zip ({len(font['typefaces'])} files)")
 
-    print(f"→ writing {OUTPUT_JSON.name}")
-    OUTPUT_JSON.write_text(
-        json.dumps(fonts, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-    print(f"→ writing {INDEX_HTML.name} front matter")
+    print("→ writing index.html front matter")
     write_index_html()
 
     print(f"\n✓ build complete — {len(fonts)} fonts, "
           f"{sum(len(f['typefaces']) for f in fonts)} typefaces total")
-
-
-def write_index_html() -> None:
-    """(Re)writes index.html with Jekyll front matter pointing at the gallery
-    layout. Content itself is rendered client-side by assets/app.js, which
-    fetches fonts.generated.json — so this file only needs the front matter
-    plus a couple of Jekyll-templated meta tags."""
-    front_matter = (
-        "---\n"
-        "layout: gallery\n"
-        "title: خطوط عربية\n"
-        "description: معرض خطوط عربية مجانية — عاينها، حمّلها، أو ضمّنها في موقعك\n"
-        "permalink: /\n"
-        "---\n"
-    )
-    INDEX_HTML.write_text(front_matter, encoding="utf-8")
 
 
 if __name__ == "__main__":
